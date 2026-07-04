@@ -34,6 +34,14 @@ as a serial/UART, USB, or BLE link.
   `unframe`, and the incremental `CobsStreamDecoder` (reassembles packets across
   arbitrary chunk boundaries, with a `maxFrameLength` guard). Each takes a
   `sentinel` byte (default `0x00`) so frames can be delimited by any chosen byte.
+- **`java.io` stream adapters** — `CobsFramedOutputStream.writeFrame` /
+  `CobsFramedInputStream.readFrame` (plus `frames()` as a `Sequence`) wrap any
+  `OutputStream` / `InputStream` to write and read self-delimiting frames. They
+  use only `java.io`, so they add no dependency.
+- **Coroutines `Flow` hook** — `Flow<ByteArray>.cobsFrames()` reassembles a flow
+  of raw chunks into a flow of decoded packets. `kotlinx-coroutines` is a
+  `compileOnly` dependency, so the published artifact stays free of any runtime
+  dependency; the extension is available to consumers who already use coroutines.
 - **Zero dependencies**, pure Kotlin, no Android framework APIs in the logic.
   `minSdk 21`, `compileSdk 35`.
 
@@ -120,6 +128,39 @@ val n = Cobs.decodeInPlace(buf)                      // n == 3; buf.copyOf(n) ==
 val framed = CobsFraming.frame(byteArrayOf(0x11, 0x00, 0x22), sentinel = s) // ...trailing 0xAA
 CobsFraming.unframe(framed, sentinel = s)                                   // [[0x11,0x00,0x22]]
 val rxAA = CobsStreamDecoder(maxFrameLength = 4096, sentinel = s)
+```
+
+### `java.io` stream adapters
+
+Wrap any `OutputStream` / `InputStream` to write and read self-delimiting frames
+(dependency-free — `java.io` only). `readFrame()` returns `null` at end of stream;
+`frames()` exposes the same reads as a `Sequence`.
+
+```kotlin
+import dev.firechip.cobs.CobsFramedOutputStream
+import dev.firechip.cobs.CobsFramedInputStream
+
+CobsFramedOutputStream(socket.outputStream).use { out ->
+    out.writeFrame(byteArrayOf(0x11, 0x00, 0x22)) // encoded frame + 0x00 delimiter
+}
+
+val input = CobsFramedInputStream(socket.inputStream) // reduced / sentinel optional
+for (packet in input.frames()) handlePacket(packet)
+```
+
+### Coroutines `Flow`
+
+`Flow<ByteArray>.cobsFrames()` reassembles a flow of raw chunks (however
+misaligned) into a flow of decoded packets. `kotlinx-coroutines` is a
+`compileOnly` dependency, so it adds nothing to the published artifact; add it to
+your own build to use this extension.
+
+```kotlin
+import dev.firechip.cobs.cobsFrames
+
+serialBytes // Flow<ByteArray> of raw reads
+    .cobsFrames() // reduced / skipEmpty / sentinel optional
+    .collect { packet -> handlePacket(packet) }
 ```
 
 Invalid encoded input throws `CobsDecodeException`.
