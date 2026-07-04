@@ -1,0 +1,6 @@
+# Definition of Done, shown by `tbdflow commit` before each commit.
+checklist:
+  - "`./gradlew :cobs:testDebugUnitTest` passes."
+  - "`./gradlew :cobs:assembleRelease` builds the .aar."
+  - "New behaviour is covered by tests (golden vectors for codec changes)."
+  - "The library still conforms to the firechip/cobs-conformance vectors."
