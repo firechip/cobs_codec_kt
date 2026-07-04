@@ -29,7 +29,7 @@ jobs:
       - name: Test and assemble
         run: ./gradlew :cobs:testDebugUnitTest :cobs:assembleRelease --console=plain
       - name: Upload AAR artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cobs_codec_kt-aar
           path: cobs/build/outputs/aar/*.aar

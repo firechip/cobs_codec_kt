@@ -33,7 +33,7 @@ jobs:
           cp cobs/build/outputs/aar/cobs-release.aar "dist/cobs_codec_kt-${version}.aar"
           echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Upload as workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cobs_codec_kt-aar-release
           path: dist/*.aar
