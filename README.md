@@ -29,7 +29,7 @@ as a serial/UART, USB, or BLE link.
 ### Gradle (GitHub Packages)
 
 The library is published to the GitHub Packages Maven registry as
-`dev.firechip:cobs_codec_kt`. Add the repository and the dependency:
+`dev.firechip:cobs_codec`. Add the repository and the dependency:
 
 ```kotlin
 repositories {
@@ -45,7 +45,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.firechip:cobs_codec_kt:1.0.0")
+    implementation("dev.firechip:cobs_codec:1.0.0")
 }
 ```
 

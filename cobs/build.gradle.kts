@@ -57,10 +57,10 @@ publishing {
                 from(components["release"])
             }
             groupId = "dev.firechip"
-            artifactId = "cobs_codec_kt"
+            artifactId = "cobs_codec"
             version = project.version.toString()
             pom {
-                name = "cobs_codec_kt"
+                name = "cobs_codec"
                 description =
                     "Pure-Kotlin Consistent Overhead Byte Stuffing (COBS) and " +
                     "COBS/R for Android."
