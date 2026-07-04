@@ -22,9 +22,18 @@ as a serial/UART, USB, or BLE link.
 ## Features
 
 - **Basic COBS** and **COBS/R (Reduced)** encode/decode (`Cobs`, `Cobsr`).
-- **Stream framing** for `0x00`-delimited links: `CobsFraming.frame` /
+- **Configurable sentinel** — encode/decode (both COBS and COBS/R) against any
+  delimiter byte instead of `0x00`, via `encodeWithSentinel` / `decodeWithSentinel`.
+  The encoded output never contains the sentinel byte, so a non-`0x00` byte can
+  delimit frames; a `sentinel` of `0` is byte-for-byte identical to the plain
+  codec.
+- **In-place decode** (basic COBS) — `Cobs.decodeInPlace` decodes within the same
+  buffer with no second allocation, returning the decoded length. COBS never
+  expands on decode, so the decoded bytes occupy the front of the buffer.
+- **Stream framing** for delimiter-framed links: `CobsFraming.frame` /
   `unframe`, and the incremental `CobsStreamDecoder` (reassembles packets across
-  arbitrary chunk boundaries, with a `maxFrameLength` guard).
+  arbitrary chunk boundaries, with a `maxFrameLength` guard). Each takes a
+  `sentinel` byte (default `0x00`) so frames can be delimited by any chosen byte.
 - **Zero dependencies**, pure Kotlin, no Android framework APIs in the logic.
   `minSdk 21`, `compileSdk 35`.
 
@@ -93,6 +102,24 @@ val packets = CobsFraming.unframe(frame)
 // Decode a live serial stream whose chunks do not align with frame boundaries.
 val rx = CobsStreamDecoder(maxFrameLength = 4096)
 serialPort.onBytes { chunk -> rx.feed(chunk).forEach(::handlePacket) }
+
+// Configurable sentinel: encode/decode against any delimiter byte, not just 0x00.
+// The output never contains the sentinel, so it can delimit frames instead of 0x00.
+// A Byte literal above 0x7F needs `.toByte()`, e.g. 0xAA.toByte().
+val s = 0xAA.toByte()
+val stuffed = Cobs.encodeWithSentinel(byteArrayOf(0x11, 0x00, 0x22), s) // [0xA8,0xBB,0xA8,0x88], no 0xAA
+Cobs.decodeWithSentinel(stuffed, s)                                     // [0x11,0x00,0x22]
+Cobsr.encodeWithSentinel(byteArrayOf(0x11, 0x00, 0x22), s)             // [0xA8,0xBB,0x88], COBS/R variant
+
+// In-place decode (basic COBS only): no second allocation; returns the decoded length.
+val buf = Cobs.encode(byteArrayOf(0x11, 0x00, 0x22)) // [0x02,0x11,0x02,0x22]
+val n = Cobs.decodeInPlace(buf)                      // n == 3; buf.copyOf(n) == [0x11,0x00,0x22]
+// Cobs.decodeInPlace(buf, s) does the same for sentinel-encoded data.
+
+// Sentinel-aware framing: frame/unframe and the stream decoder all take a sentinel.
+val framed = CobsFraming.frame(byteArrayOf(0x11, 0x00, 0x22), sentinel = s) // ...trailing 0xAA
+CobsFraming.unframe(framed, sentinel = s)                                   // [[0x11,0x00,0x22]]
+val rxAA = CobsStreamDecoder(maxFrameLength = 4096, sentinel = s)
 ```
 
 Invalid encoded input throws `CobsDecodeException`.
