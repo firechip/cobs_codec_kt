@@ -165,6 +165,19 @@ serialBytes // Flow<ByteArray> of raw reads
 
 Invalid encoded input throws `CobsDecodeException`.
 
+## Benchmarks
+
+Single-threaded JVM throughput on a 1 KiB payload (JDK 25, AMD Ryzen 7 3800XT
+under WSL2) — ballpark micro-benchmark numbers:
+
+| Operation | Throughput |
+| --------- | ---------- |
+| `Cobs.encode` | ~580 MB/s |
+| `Cobs.decode` | ~850 MB/s |
+| `Cobsr.encode` | ~600 MB/s |
+
+Run with `COBS_BENCH=1 ./gradlew :cobs:testDebugUnitTest --tests '*BenchmarkTest*' --rerun-tasks`.
+
 ## Build
 
 Requires JDK 17 or newer (CI builds on JDK 25) and the Android SDK
