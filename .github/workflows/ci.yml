@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "25"
       - uses: android-actions/setup-android@v4
       - name: Install SDK packages
         run: sdkmanager "platforms;android-35" "build-tools;36.0.0"
@@ -44,7 +44,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "25"
       - uses: android-actions/setup-android@v4
       - name: Install SDK packages
         run: sdkmanager "platforms;android-35" "build-tools;36.0.0"

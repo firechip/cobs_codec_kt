@@ -95,7 +95,8 @@ Invalid encoded input throws `CobsDecodeException`.
 
 ## Build
 
-Requires JDK 17 and the Android SDK (`compileSdk 35`).
+Requires JDK 17 or newer (CI builds on JDK 25) and the Android SDK
+(`compileSdk 35`).
 
 ```console
 ./gradlew :cobs:assembleRelease   # -> cobs/build/outputs/aar/cobs-release.aar

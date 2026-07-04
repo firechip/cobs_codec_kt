@@ -4,8 +4,7 @@ Thanks for your interest in improving `cobs_codec_kt`!
 
 ## Getting started
 
-You need **JDK 17** and the **Android SDK** (`compileSdk 35`, `build-tools
-35.0.0`). The Gradle wrapper pins the Gradle version, so no separate Gradle
+You need **JDK 17 or newer** (CI builds on JDK 25) and the **Android SDK** (`compileSdk 35`, `build-tools 36.0.0`). The Gradle wrapper pins the Gradle version, so no separate Gradle
 install is needed.
 
 ```console
