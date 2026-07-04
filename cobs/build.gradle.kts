@@ -33,6 +33,16 @@ android {
         }
     }
 
+    lint {
+        // Fail the build on any real lint issue.
+        abortOnError = true
+        warningsAsErrors = true
+        // GradleDependency only nags that a newer compileSdk/dependency exists;
+        // this pure-Kotlin library uses no Android APIs, so the compileSdk level
+        // is immaterial and version bumps are made deliberately.
+        disable += "GradleDependency"
+    }
+
     publishing {
         singleVariant("release") {
             withSourcesJar()
@@ -43,6 +53,7 @@ android {
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_17
+        allWarningsAsErrors = true
     }
 }
 
