@@ -33,3 +33,22 @@ jobs:
         with:
           name: cobs_codec_kt-aar
           path: cobs/build/outputs/aar/*.aar
+
+  conformance:
+    name: Conformance vectors
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+      - name: Install SDK packages
+        run: sdkmanager "platforms;android-35" "build-tools;36.0.0"
+      - name: Download shared conformance vectors
+        run: curl -sSfL -o vectors.jsonl https://raw.githubusercontent.com/firechip/cobs-conformance/v1.0.0/vectors/vectors.jsonl
+      - name: Check conformance
+        env:
+          COBS_CONFORMANCE_VECTORS: ${{ github.workspace }}/vectors.jsonl
+        run: ./gradlew :cobs:testDebugUnitTest --tests "dev.firechip.cobs.ConformanceTest" --console=plain
