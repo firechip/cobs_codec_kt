@@ -1,14 +1,18 @@
-# cobs_codec_kt
+# cobs_codec
+
+_Kotlin / Android edition — Maven artifact `dev.firechip:cobs_codec`, repository
+[`cobs_codec_kt`](https://github.com/firechip/cobs_codec_kt) (the `_kt` suffix is
+just the repo slug)._
 
 [![CI](https://github.com/firechip/cobs_codec_kt/actions/workflows/ci.yml/badge.svg)](https://github.com/firechip/cobs_codec_kt/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/firechip/cobs_codec_kt?sort=semver)](https://github.com/firechip/cobs_codec_kt/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Pure-Kotlin **Consistent Overhead Byte Stuffing (COBS)** and **COBS/R** for
-Android, distributed as an `.aar`. It is the Kotlin sibling of the Dart
-[`cobs_codec`](https://pub.dev/packages/cobs_codec) package and produces
-byte-identical output (validated by 20,000-vector differential testing against
-the original reference implementation).
+Android, distributed as an `.aar`. It is the Kotlin/Android member of the
+Firechip COBS family (alongside the Dart
+[`cobs_codec`](https://pub.dev/packages/cobs_codec) on pub.dev) and produces
+byte-identical output (validated against the shared conformance vectors).
 
 COBS encodes an arbitrary `ByteArray` into one that contains no zero (`0x00`)
 bytes, at a small, predictable cost (at most one extra byte per 254 bytes, plus
@@ -63,7 +67,7 @@ authentication:
 
 ```kotlin
 dependencies {
-    implementation(files("libs/cobs_codec_kt-1.0.0.aar"))
+    implementation(files("libs/cobs_codec-1.0.0.aar"))
 }
 ```
 

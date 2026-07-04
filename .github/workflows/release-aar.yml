@@ -30,19 +30,19 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           if [ "$version" = "$GITHUB_REF_NAME" ]; then version="dev"; fi
           mkdir -p dist
-          cp cobs/build/outputs/aar/cobs-release.aar "dist/cobs_codec_kt-${version}.aar"
+          cp cobs/build/outputs/aar/cobs-release.aar "dist/cobs_codec-${version}.aar"
           echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Upload as workflow artifact
         uses: actions/upload-artifact@v7
         with:
-          name: cobs_codec_kt-aar-release
+          name: cobs_codec-aar-release
           path: dist/*.aar
       - name: Attach to GitHub release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v3
         with:
           files: dist/*.aar
-          name: cobs_codec_kt ${{ steps.stage.outputs.version }}
+          name: cobs_codec ${{ steps.stage.outputs.version }}
           body: |
             Pure-Kotlin **COBS / COBS-R** for Android, packaged as an `.aar`.
 
@@ -51,5 +51,5 @@ jobs:
 
             Add to your app:
             ```kotlin
-            implementation(files("libs/cobs_codec_kt-${{ steps.stage.outputs.version }}.aar"))
+            implementation(files("libs/cobs_codec-${{ steps.stage.outputs.version }}.aar"))
             ```

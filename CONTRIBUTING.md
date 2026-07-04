@@ -1,6 +1,6 @@
-# Contributing to cobs_codec_kt
+# Contributing to cobs_codec (Kotlin/Android)
 
-Thanks for your interest in improving `cobs_codec_kt`!
+Thanks for your interest in improving `cobs_codec` (repository `cobs_codec_kt`)!
 
 ## Getting started
 
