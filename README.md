@@ -26,9 +26,40 @@ as a serial/UART, USB, or BLE link.
 
 ## Install
 
-The `.aar` is attached to each
-[GitHub release](https://github.com/firechip/cobs_codec_kt/releases). Download
-`cobs_codec_kt-<version>.aar` into your app's `libs/` directory and add:
+### Gradle (GitHub Packages)
+
+The library is published to the GitHub Packages Maven registry as
+`dev.firechip:cobs_codec_kt`. Add the repository and the dependency:
+
+```kotlin
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/firechip/cobs_codec_kt")
+        credentials {
+            username = providers.gradleProperty("gpr.user").orNull
+                ?: System.getenv("GITHUB_ACTOR")
+            password = providers.gradleProperty("gpr.key").orNull
+                ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation("dev.firechip:cobs_codec_kt:1.0.0")
+}
+```
+
+> GitHub Packages requires authentication even for public packages. Use a GitHub
+> [personal access token](https://github.com/settings/tokens) with the
+> `read:packages` scope, set as `gpr.user` / `gpr.key` in
+> `~/.gradle/gradle.properties` (or the `GITHUB_ACTOR` / `GITHUB_TOKEN`
+> environment variables).
+
+### Direct `.aar` download
+
+Alternatively, the `.aar` is attached to every
+[GitHub release](https://github.com/firechip/cobs_codec_kt/releases) and needs no
+authentication:
 
 ```kotlin
 dependencies {
