@@ -1,0 +1,41 @@
+name: Bug report
+description: Report incorrect encoding/decoding or another defect in cobs_codec_kt.
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Thanks for filing a bug! A minimal, byte-level reproduction is the most
+        helpful thing you can provide.
+  - type: input
+    id: version
+    attributes:
+      label: cobs_codec_kt version (.aar)
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Android Gradle Plugin / Kotlin / JDK versions
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Include the input bytes (hex), what you expected, and what you got.
+      placeholder: |
+        Input:    0x11 0x00 0x22
+        Expected: 0x02 0x11 0x02 0x22
+        Actual:   ...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      render: kotlin
+    validations:
+      required: false

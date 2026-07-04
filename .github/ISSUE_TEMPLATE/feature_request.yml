@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest a new capability or improvement for cobs_codec_kt.
+title: "[feat]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      render: kotlin
+    validations:
+      required: false
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - label: >
+            I understand cobs_codec_kt aims to stay a small, focused byte-stuffing
+            library (COBS/COBS-R + framing), not a general serialization framework.
+          required: true

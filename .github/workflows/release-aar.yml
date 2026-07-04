@@ -1,0 +1,55 @@
+name: Release AAR
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build AAR and attach to release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - name: Install SDK packages
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Build AAR and run unit tests
+        run: ./gradlew :cobs:testDebugUnitTest :cobs:assembleRelease --console=plain
+      - name: Stage artifact
+        id: stage
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if [ "$version" = "$GITHUB_REF_NAME" ]; then version="dev"; fi
+          mkdir -p dist
+          cp cobs/build/outputs/aar/cobs-release.aar "dist/cobs_codec_kt-${version}.aar"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Upload as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobs_codec_kt-aar-release
+          path: dist/*.aar
+      - name: Attach to GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.aar
+          name: cobs_codec_kt ${{ steps.stage.outputs.version }}
+          body: |
+            Pure-Kotlin **COBS / COBS-R** for Android, packaged as an `.aar`.
+
+            Byte-identical to the Dart [`cobs_codec`](https://pub.dev/packages/cobs_codec)
+            (validated by a 20,000-vector differential test against the reference).
+
+            Add to your app:
+            ```kotlin
+            implementation(files("libs/cobs_codec_kt-${{ steps.stage.outputs.version }}.aar"))
+            ```
