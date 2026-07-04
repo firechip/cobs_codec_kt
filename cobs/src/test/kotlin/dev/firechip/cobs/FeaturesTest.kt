@@ -69,6 +69,85 @@ class FeaturesTest {
         }
     }
 
+    // Golden COBS/R encodings ported from the reference suite: valid wire
+    // sequences, including reduced final blocks (e.g. `bytes(0x02)`), embedded
+    // zeros, and maximal `0xFF` length codes.
+    private val cobsrGolden: List<ByteArray> = listOf(
+        bytes(0x01),
+        bytes(0x02, 0x01),
+        bytes(0x02),
+        bytes(0x03),
+        bytes(0x7E),
+        bytes(0x7F),
+        bytes(0x80),
+        bytes(0xD5),
+        bytes(0xFE),
+        bytes(0xFF),
+        cat(bytes(0x03), ascii("a"), bytes(0x02)),
+        cat(bytes(0x03), ascii("a")),
+        cat(bytes(0xFF), ascii("a")),
+        bytes(0x06, 0x05, 0x04, 0x03, 0x02, 0x01),
+        cat(bytes(0x35), ascii("1234")),
+        cat(bytes(0x06), ascii("12345"), bytes(0x05, 0x04, 0x03, 0x02, 0x01)),
+        cat(bytes(0x06), ascii("12345"), ascii("9678")),
+        cat(bytes(0x01, 0x06), ascii("12345"), ascii("9678")),
+        cat(bytes(0x06), ascii("12345"), bytes(0x05), ascii("6789"), bytes(0x01)),
+        bytes(0x01, 0x01),
+        bytes(0x01, 0x01, 0x01),
+        bytes(0x01, 0x01, 0x01, 0x01),
+        cat(bytes(0xFE), range(1, 254)),
+        cat(bytes(0xFF), range(1, 255)),
+        cat(bytes(0xFF), range(1, 255), bytes(0xFF)),
+        cat(bytes(0x01, 0xFF), range(1, 255), bytes(0xFF)),
+        cat(bytes(0xFF), range(2, 255)),
+    )
+
+    /**
+     * The in-place COBS/R decoder must be byte-identical to the slice decoder on
+     * every input and agree on accept/reject. Checked over the golden vectors and
+     * a large seeded-random corpus: half well-formed encodings of random payloads
+     * (including reduced final blocks) and half arbitrary bytes, which stress the
+     * reject paths with embedded zeros and length codes running past the end.
+     */
+    @Test
+    fun cobsrDecodeInPlaceMatchesDecode() {
+        for (encoded in cobsrGolden) {
+            for (s in sentinels) assertCobsrInPlaceMatchesSlice(encoded, s)
+        }
+
+        val rng = Random(0x0C0B5A17)
+        repeat(20000) {
+            val wire = if (rng.nextBoolean()) {
+                val len = rng.nextInt(0, 701)
+                Cobsr.encode(ByteArray(len) { rng.nextInt(0, 256).toByte() })
+            } else {
+                val len = rng.nextInt(0, 40)
+                ByteArray(len) { rng.nextInt(0, 256).toByte() }
+            }
+            for (s in sentinels) assertCobsrInPlaceMatchesSlice(wire, s)
+        }
+    }
+
+    /** Asserts in-place COBS/R decode agrees with the slice decoder: value and error. */
+    private fun assertCobsrInPlaceMatchesSlice(wire: ByteArray, sentinel: Byte) {
+        val slice = runCatching { Cobsr.decodeWithSentinel(wire, sentinel) }
+        val buf = wire.copyOf()
+        val inPlace = runCatching { Cobsr.decodeInPlace(buf, sentinel) }
+
+        if (slice.isSuccess) {
+            assertTrue(
+                "in-place must accept what the slice decoder accepts",
+                inPlace.isSuccess,
+            )
+            assertArrayEquals(slice.getOrThrow(), buf.copyOf(inPlace.getOrThrow()))
+        } else {
+            assertTrue(
+                "in-place must reject what the slice decoder rejects",
+                inPlace.exceptionOrNull() is CobsDecodeException,
+            )
+        }
+    }
+
     @Test
     fun framingWithSentinelRoundTrips() {
         val rng = Random(0x57EA9000)
