@@ -65,6 +65,25 @@ public object Cobsr {
     }
 
     /**
+     * Encodes [input] with COBS/R using an arbitrary [sentinel] byte instead of
+     * `0x00`, returning a [ByteArray] that never contains the [sentinel] byte.
+     *
+     * This runs the ordinary encode and then XORs every output byte with
+     * [sentinel]. A [sentinel] of `0` is byte-for-byte identical to [encode].
+     */
+    @JvmStatic
+    public fun encodeWithSentinel(input: ByteArray, sentinel: Byte): ByteArray {
+        val out = encode(input)
+        val s = sentinel.toInt() and 0xFF
+        if (s != 0) {
+            for (i in out.indices) {
+                out[i] = (out[i].toInt() xor s).toByte()
+            }
+        }
+        return out
+    }
+
+    /**
      * Decodes COBS/R-encoded [input], returning the original bytes. The empty
      * input decodes to an empty array.
      *
@@ -107,5 +126,26 @@ public object Cobsr {
         }
 
         return out.copyOf(writeIndex)
+    }
+
+    /**
+     * Decodes COBS/R [input] that was encoded with an arbitrary [sentinel] byte
+     * (see [encodeWithSentinel]), returning the original bytes.
+     *
+     * A fresh copy of [input] is XORed back with [sentinel] before decoding, so
+     * the caller's array is never mutated. A [sentinel] of `0` is identical to
+     * [decode].
+     *
+     * @throws CobsDecodeException if [input] contains the [sentinel] byte.
+     */
+    @JvmStatic
+    public fun decodeWithSentinel(input: ByteArray, sentinel: Byte): ByteArray {
+        val s = sentinel.toInt() and 0xFF
+        if (s == 0) return decode(input)
+        val src = input.copyOf()
+        for (i in src.indices) {
+            src[i] = (src[i].toInt() xor s).toByte()
+        }
+        return decode(src)
     }
 }

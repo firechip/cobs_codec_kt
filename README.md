@@ -49,7 +49,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.firechip:cobs_codec:1.0.0")
+    implementation("dev.firechip:cobs_codec:1.1.0")
 }
 ```
 
@@ -67,7 +67,7 @@ authentication:
 
 ```kotlin
 dependencies {
-    implementation(files("libs/cobs_codec-1.0.0.aar"))
+    implementation(files("libs/cobs_codec-1.1.0.aar"))
 }
 ```
 
