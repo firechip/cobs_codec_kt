@@ -3,6 +3,27 @@
 All notable changes to this library are documented here. This project adheres
 to [Semantic Versioning](https://semver.org).
 
+## 1.2.0
+
+### Added
+
+- **`java.io` framing streams**: `CobsFramedOutputStream` and
+  `CobsFramedInputStream` write and read `0x00`-delimited COBS frames over any
+  `OutputStream` / `InputStream`.
+- **Coroutines `Flow` API**: `Flow<ByteArray>.cobsFrames()` frames a flow of
+  packets for a stream. The `kotlinx-coroutines` dependency is `compileOnly`, so
+  no runtime dependency is imposed on consumers that don't use it.
+- **In-place COBS/R decoding**: `Cobsr.decodeInPlace` (with a `sentinel`
+  overload) decodes the reduced codec within the same buffer.
+
+All additions are backward compatible.
+
+### Changed
+
+- Added an (env-gated) JVM throughput micro-benchmark.
+- Extended the conformance test to also cover the configurable-sentinel and
+  decode-error vectors from firechip/cobs-conformance.
+
 ## 1.1.0
 
 ### Added
