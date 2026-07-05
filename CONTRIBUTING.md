@@ -81,8 +81,21 @@ pull request.
 
 ## Releasing
 
-Push a `v*` tag (for example `v1.0.0`); the `Release AAR` workflow builds the
-`.aar` and attaches it to the corresponding GitHub release.
+Publishing is automated from a signed `v*` tag; still give the **GitHub Release
+a proper description — don't skip it.** The full checklist:
+
+1. Bump `version` in [`cobs/build.gradle.kts`](cobs/build.gradle.kts) and add a
+   `## X.Y.Z` section to [`CHANGELOG.md`](CHANGELOG.md).
+2. Commit (`chore: release X.Y.Z`) and tag it **signed**:
+   `git tag -s vX.Y.Z -m "cobs_codec X.Y.Z"`; push `main` and the tag.
+3. The tag triggers two workflows:
+   [`publish-maven.yml`](.github/workflows/publish-maven.yml) publishes
+   `dev.firechip:cobs_codec` to **GitHub Packages** (Maven), and
+   [`release-aar.yml`](.github/workflows/release-aar.yml) builds the `.aar` and
+   attaches it to the **GitHub Release** it creates for the tag.
+4. Edit that release's description to match the other members: the
+   `CHANGELOG.md` highlights, the `dev.firechip:cobs_codec:X.Y.Z` Maven
+   coordinate, and the attached `.aar`.
 
 ## License
 
